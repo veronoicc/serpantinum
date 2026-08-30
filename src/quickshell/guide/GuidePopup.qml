@@ -137,10 +137,10 @@ Item {
         { id: "Theme", key: "theme", name: "Theme", icon: "✦", file: "theme/ThemeTab.qml"},
         { id: "Notifications", key: "notifications", name: "Notifications", icon: "󰂚", file: "notifications/NotificationsTab.qml" },
         { id: "Idle", key: "idle", name: "Idle", icon: "󰒲", file: "IdleTab.qml" },
+        { id: "Downloader", key: "downloader", name: "Downloader", icon: "󰇚", file: "downloader/DownloaderSettingsTab.qml" },
         { id: "Wellbeing", key: "wellbeing", name: "Wellbeing", icon: "󰄉", file: "wellbeing/DigitalWellbeingTab.qml" },
         { id: "About", key: "about", name: "About", icon: "", file: "AboutTab.qml" }
     ]
-
     property real introBase: 0.0
     property real introSidebar: 0.0
     property real introContent: 0.0

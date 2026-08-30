@@ -32,6 +32,7 @@
       "theme": "Tema",
       "notifications": "Notificaciones",
       "idle": "Inactividad",
+      "downloader": "Descargador",
       "wellbeing": "Bienestar",
       "tutorial": "Tutorial",
       "update": "Actualizaciones",
@@ -63,6 +64,25 @@
 	"desc": "Ordenar aplicaciones según su uso y el tiempo que se pasa en ellas"
       },			
       "test": "Abrir lanzador"
+    },
+    "downloader": {
+      "dir": {
+        "title": "Directorio de descargas",
+        "desc": "Carpeta donde se guardarán los archivos descargados"
+      },
+      "args": {
+        "title": "Argumentos por defecto de yt-dlp",
+        "desc": "Parámetros personalizados pasados a yt-dlp por defecto"
+      },
+      "autopaste": {
+        "title": "Pegar URL automáticamente",
+        "desc": "Pegar automáticamente la URL del portapapeles al abrir el descargador"
+      },
+      "copyafter": {
+        "title": "Copiar archivo al portapapeles",
+        "desc": "Copiar automáticamente el archivo descargado al portapapeles al finalizar"
+      },
+      "pick_dir": "Seleccionar carpeta de descargas"
     },
     "notifications": {
       "dnd": {

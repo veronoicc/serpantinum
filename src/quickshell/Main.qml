@@ -52,9 +52,11 @@ PanelWindow {
                     LauncherController.hide();
                 } else if (cmd === "open") {
                     ClipboardController.hide();
+                    DownloaderController.hide();
                     LauncherController.show(masterWindow.screen);
                 } else {
                     ClipboardController.hide();
+                    DownloaderController.hide();
                     LauncherController.toggle(masterWindow.screen);
                 }
                 return;
@@ -65,10 +67,27 @@ PanelWindow {
                     ClipboardController.hide();
                 } else if (cmd === "open") {
                     LauncherController.hide();
+                    DownloaderController.hide();
                     ClipboardController.show(masterWindow.screen);
                 } else {
                     LauncherController.hide();
+                    DownloaderController.hide();
                     ClipboardController.toggle(masterWindow.screen);
+                }
+                return;
+            }
+
+            if (cmd === "downloader" || targetWidget === "downloader" || cmd === "dl" || targetWidget === "dl") {
+                if (cmd === "close") {
+                    DownloaderController.hide();
+                } else if (cmd === "open") {
+                    LauncherController.hide();
+                    ClipboardController.hide();
+                    DownloaderController.show(masterWindow.screen);
+                } else {
+                    LauncherController.hide();
+                    ClipboardController.hide();
+                    DownloaderController.toggle(masterWindow.screen);
                 }
                 return;
             }

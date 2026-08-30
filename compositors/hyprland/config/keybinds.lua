@@ -48,6 +48,7 @@ hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("serpantinum reload"))
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("serpantinum msg toggle clipboard"))
+hl.bind(mainMod .. " + G", hl.dsp.exec_cmd("serpantinum msg toggle downloader"))
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd("serpantinum msg toggle music"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("serpantinum msg toggle system"))

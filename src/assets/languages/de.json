@@ -32,6 +32,7 @@
       "theme": "Design",
       "notifications": "Benachrichtigungen",
       "idle": "Inaktivität",
+      "downloader": "Downloader",
       "wellbeing": "Wohlbefinden",
       "tutorial": "Tutorial",
       "update": "Update",
@@ -63,6 +64,25 @@
 	"desc": "Apps basierend auf ihrer Nutzungshäufigkeit und der darin verbrachten Zeit sortieren"
       },			
       "test": "Starter öffnen"
+    },
+    "downloader": {
+      "dir": {
+        "title": "Download-Verzeichnis",
+        "desc": "Ordner, in dem heruntergeladene Dateien gespeichert werden"
+      },
+      "args": {
+        "title": "Standard-Argumente für yt-dlp",
+        "desc": "Standardmäßig an yt-dlp übergebene Flags"
+      },
+      "autopaste": {
+        "title": "URL automatisch einfügen",
+        "desc": "URL aus der Zwischenablage beim Öffnen automatisch einfügen"
+      },
+      "copyafter": {
+        "title": "Datei in Zwischenablage kopieren",
+        "desc": "Heruntergeladene Datei nach Fertigstellung automatisch kopieren"
+      },
+      "pick_dir": "Download-Ordner auswählen"
     },
     "notifications": {
       "dnd": {

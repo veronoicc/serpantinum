@@ -32,6 +32,7 @@
       "theme": "Theme",
       "notifications": "Notifications",
       "idle": "Idle",
+      "downloader": "Downloader",
       "wellbeing": "Wellbeing",
       "tutorial": "Tutorial",
       "update": "Update",
@@ -63,6 +64,25 @@
 	"desc": "Sort apps based on usage and amount of time spent in them"			
       },			
       "test": "Open launcher"
+    },
+    "downloader": {
+      "dir": {
+        "title": "Download directory",
+        "desc": "Folder where downloaded files will be stored"
+      },
+      "args": {
+        "title": "Default yt-dlp arguments",
+        "desc": "Custom flags passed to yt-dlp by default"
+      },
+      "autopaste": {
+        "title": "Auto-paste URL",
+        "desc": "Automatically paste clipboard URL when opening Downloader"
+      },
+      "copyafter": {
+        "title": "Copy file to clipboard",
+        "desc": "Automatically copy downloaded file to clipboard upon completion"
+      },
+      "pick_dir": "Select download directory"
     },
     "notifications": {
       "dnd": {
