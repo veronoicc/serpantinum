@@ -21,10 +21,8 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
 
-    mask: Region {
-        item: (clipboardWindow.isVisible || container.animProgress > 0.001) ? maskBoundary : null
-    }
-
+    Region { id: emptyRegion }
+    mask: (clipboardWindow.isVisible || container.animProgress > 0.001) ? null : emptyRegion
     anchors {
         top: true
         bottom: true
