@@ -121,6 +121,20 @@ PanelWindow {
             urlInput.forceInputFocus();
         }
     }
+    function isLikelyUrl(str) {
+        if (!str) return false;
+        let s = str.trim();
+        if (s.length < 4 || s.indexOf(" ") !== -1 || s.indexOf("\n") !== -1 || s.indexOf("\r") !== -1 || s.indexOf("\t") !== -1) {
+            return false;
+        }
+        if (/^https?:\/\/[^\s]+$/i.test(s)) {
+            return true;
+        }
+        if (/^www\.[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)+[^\s]*$/i.test(s)) {
+            return true;
+        }
+        return false;
+    }
 
     Process {
         id: pasteCheckProc
@@ -129,10 +143,11 @@ PanelWindow {
         stdout: StdioCollector {
             onStreamFinished: {
                 let txt = (this.text || "").trim();
-                if (txt.match(/^https?:\/\//i)) {
-                    if (urlInput.text === "" || urlInput.text.trim().match(/^https?:\/\//i)) {
-                        urlInput.text = txt;
+                if (downloaderWindow.isLikelyUrl(txt)) {
+                    if (txt.match(/^www\./i)) {
+                        txt = "https://" + txt;
                     }
+                    urlInput.text = txt;
                 }
             }
         }
@@ -272,6 +287,7 @@ PanelWindow {
 
     onIsVisibleChanged: {
         if (isVisible) {
+            urlInput.clear();
             syncSettings();
             if (downloaderWindow.status !== "downloading") {
                 downloaderWindow.status = "idle";
