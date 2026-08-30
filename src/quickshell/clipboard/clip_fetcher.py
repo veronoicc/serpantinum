@@ -3,10 +3,10 @@ import subprocess
 import json
 import os
 import sys
+import time
 import threading
 import concurrent.futures
 import urllib.parse
-
 IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp', '.svg', '.ico', '.tiff', '.tif', '.avif', '.jxl'}
 
 def check_image_path(text):
@@ -83,6 +83,42 @@ def toggle_pin(iid, cache_dir):
     with open(pinned_file, 'w') as f:
         json.dump(pinned, f)
 
+def copy_item(iid, is_pinned=False, cache_dir=None):
+    try:
+        proc = subprocess.run(["cliphist", "decode", str(iid)], capture_output=True)
+        raw = proc.stdout
+        if not raw:
+            return
+        try:
+            text = raw.decode("utf-8")
+            lines = [line.strip() for line in text.splitlines() if line.strip()]
+            file_uris = [line for line in lines if line.startswith("file://")]
+            if file_uris:
+                payload = "\r\n".join(file_uris) + "\r\n"
+                subprocess.run(["wl-copy", "-t", "text/uri-list"], input=payload.encode("utf-8"))
+            else:
+                subprocess.run(["wl-copy"], input=raw)
+        except UnicodeDecodeError:
+            subprocess.run(["wl-copy"], input=raw)
+
+        if is_pinned and cache_dir:
+            time.sleep(0.05)
+            try:
+                res = subprocess.run(["cliphist", "list"], capture_output=True, text=True)
+                lines = res.stdout.splitlines()
+                if lines and "\t" in lines[0]:
+                    new_id = lines[0].split("\t", 1)[0]
+                    pinned_file = os.path.join(cache_dir, "pinned.json")
+                    pinned = get_pinned_items(cache_dir)
+                    if new_id not in pinned:
+                        pinned.append(new_id)
+                        with open(pinned_file, 'w') as f:
+                            json.dump(pinned, f)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
 def delete_item(iid, cache_dir):
     try:
         result = subprocess.run(["cliphist", "list"], capture_output=True, text=True)
@@ -119,6 +155,12 @@ def get_cliphist():
             except Exception:
                 pass
             print("[]")
+            return
+        elif action == "copy" and len(sys.argv) > 2:
+            is_pinned = len(sys.argv) > 3 and sys.argv[3] == "1"
+            if len(sys.argv) > 4:
+                cache_dir = sys.argv[4]
+            copy_item(sys.argv[2], is_pinned=is_pinned, cache_dir=cache_dir)
             return
         elif action == "delete" and len(sys.argv) > 2:
             delete_item(sys.argv[2], cache_dir)
@@ -161,7 +203,8 @@ def get_cliphist():
             display_content = img_path
         else:
             img_file = check_image_path(content)
-            if not img_file and ("nautilus" in content or "clipboard" in content or content == "copy" or content.startswith("file:")):
+            dec = None
+            if not img_file and ("nautilus" in content or "clipboard" in content or content == "copy" or content.startswith("file:") or "file://" in content):
                 try:
                     dec = subprocess.run(["cliphist", "decode", iid], capture_output=True, text=True, errors='ignore').stdout
                     img_file = check_image_path(dec)
@@ -170,7 +213,26 @@ def get_cliphist():
             if img_file:
                 item_type = "image"
                 display_content = img_file
-
+            else:
+                check_text = dec if dec is not None else content
+                if "file://" in check_text:
+                    item_type = "file"
+                    for l in check_text.splitlines():
+                        l = l.strip()
+                        if l.startswith("file://"):
+                            path = urllib.parse.unquote(urllib.parse.urlparse(l).path)
+                            fname = os.path.basename(path.rstrip('/'))
+                            display_content = fname if fname else path
+                            break
+                        elif "file://" in l:
+                            for part in l.split():
+                                if part.startswith("file://"):
+                                    path = urllib.parse.unquote(urllib.parse.urlparse(part).path)
+                                    fname = os.path.basename(path.rstrip('/'))
+                                    display_content = fname if fname else path
+                                    break
+                            if display_content != content.strip():
+                                break
         items.append({
             "id": iid,
             "content": display_content,

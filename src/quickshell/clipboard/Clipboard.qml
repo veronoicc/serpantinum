@@ -342,11 +342,9 @@ PanelWindow {
 
     function copyClip(id, isPinned) {
         if (typeof Sounds !== "undefined") Sounds.playSfx("system/quick_click.wav");
-        if (isPinned) {
-            Quickshell.execDetached(["bash", "-c", "cliphist decode " + id + " | wl-copy && (sleep 0.15; NEW_ID=$(cliphist list | head -n 1 | awk '{print $1}'); python3 " + Caching.qsDir + "/clipboard/clip_fetcher.py pin $NEW_ID " + Caching.getCacheDir("clipboard") + ") &"]);
-        } else {
-            Quickshell.execDetached(["bash", "-c", "cliphist decode " + id + " | wl-copy"]);
-        }
+        let qsDir = (typeof Caching !== "undefined" && Caching.qsDir) ? Caching.qsDir : "";
+        let cacheDir = (typeof Caching !== "undefined" && Caching.getCacheDir) ? Caching.getCacheDir("clipboard") : "";
+        Quickshell.execDetached(["python3", qsDir + "/clipboard/clip_fetcher.py", "copy", id.toString(), isPinned ? "1" : "0", cacheDir]);
         closeClipboard();
     }
 
@@ -1314,7 +1312,7 @@ PanelWindow {
                                         font.family: "Iosevka Nerd Font"
                                         font.pixelSize: clipboardWindow.s(14)
                                         color: (!clipDelegateCard.isImage && clipDelegateWrapper.isSelected) ? ThemeBackend.crust : ThemeBackend.subtext0
-                                        text: model.type === "image" ? "󰋩" : "󰈙"
+                                        text: model.type === "image" ? "󰋩" : (model.type === "file" ? "󰈔" : "󰈙")
                                         visible: model.type !== "image" || (!model.content || clipThumbImg.status !== Image.Ready)
 
                                         Behavior on color { ColorAnimation { duration: 180; easing.type: Easing.OutCubic } }
