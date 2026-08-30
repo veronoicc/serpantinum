@@ -4,7 +4,7 @@
       "title": "Serpantinum",
       "loading": "Загрузка...",
       "unknown": "Неизвестно",
-      "version_by": "v{version} • от {author}",
+      "version_by": "v{version} • от {author}, улучшено @veronoicc",
       "hardware": {
         "device_name": "Имя устройства",
         "processor": "Процессор",
@@ -151,7 +151,7 @@
       }
     },
     "welcome": {
-      "by_author": "от @{author}",
+      "by_author": "от @{author}, улучшено @veronoicc",
       "about": "О программе",
       "hold_for_tutorial": "Зажмите для обучения",
       "start_tutorial": "Начать обучение"
@@ -663,7 +663,7 @@
   },
   "start": {
     "title": "Serpantinum",
-    "made_by": "Создано @{author}",
+    "made_by": "Создано @{author}, улучшено @veronoicc",
     "welcome": "Добро пожаловать",
     "tagline": "Оболочка рабочего стола, созданная для",
     "you": "вас",

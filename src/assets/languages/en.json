@@ -4,7 +4,7 @@
       "title": "Serpantinum",
       "loading": "Loading...",
       "unknown": "Unknown",
-      "version_by": "v{version} • by {author}",
+      "version_by": "v{version} • by {author}, enhanced by @veronoicc",
       "hardware": {
         "device_name": "Device name",
         "processor": "Processor",
@@ -151,7 +151,7 @@
       }
     },
     "welcome": {
-      "by_author": "by @{author}",
+      "by_author": "by @{author}, enhanced by @veronoicc",
       "about": "About",
       "hold_for_tutorial": "Hold for tutorial",
       "start_tutorial": "Start tutorial"
@@ -663,7 +663,7 @@
   },
   "start": {
     "title": "Serpantinum",
-    "made_by": "Made by @{author}",
+    "made_by": "Made by @{author}, enhanced by @veronoicc",
     "welcome": "Welcome",
     "tagline": "A desktop shell built for",
     "you": "You",

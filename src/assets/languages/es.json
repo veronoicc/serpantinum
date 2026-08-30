@@ -4,7 +4,7 @@
       "title": "Serpantinum",
       "loading": "Cargando...",
       "unknown": "Desconocido",
-      "version_by": "v{version} • por {author}",
+      "version_by": "v{version} • por {author}, mejorado por @veronoicc",
       "hardware": {
         "device_name": "Nombre del dispositivo",
         "processor": "Procesador",
@@ -151,7 +151,7 @@
       }
     },
     "welcome": {
-      "by_author": "por @{author}",
+      "by_author": "por @{author}, mejorado por @veronoicc",
       "about": "Acerca de",
       "hold_for_tutorial": "Mantener presionado para el tutorial",
       "start_tutorial": "Iniciar tutorial"
@@ -663,7 +663,7 @@
   },
   "start": {
     "title": "Serpantinum",
-    "made_by": "Hecho por @{author}",
+    "made_by": "Hecho por @{author}, mejorado por @veronoicc",
     "welcome": "Bienvenido",
     "tagline": "Un entorno de escritorio creado para",
     "you": "ti",
