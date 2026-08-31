@@ -6,6 +6,7 @@ import QtQuick.Shapes
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Io
 import "../"
 import "../reusables"
@@ -17,12 +18,18 @@ PanelWindow {
 
     WlrLayershell.namespace: "qs-clipboard"
     WlrLayershell.layer: WlrLayer.Overlay
-    focusable: clipboardWindow.isVisible
+    WlrLayershell.keyboardFocus: clipboardWindow.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
 
     Region { id: emptyRegion }
     mask: (clipboardWindow.isVisible || container.animProgress > 0.001) ? null : emptyRegion
+    HyprlandFocusGrab {
+        id: focusGrab
+        windows: [ clipboardWindow ]
+        active: clipboardWindow.isVisible
+        onCleared: ClipboardController.hide()
+    }
     anchors {
         top: true
         bottom: true

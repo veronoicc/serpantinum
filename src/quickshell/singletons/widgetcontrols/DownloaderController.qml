@@ -2,12 +2,33 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import "../../"
+import Quickshell.Wayland
+import Quickshell.Hyprland
 
 Item {
     id: controller
 
     property bool isVisible: false
     property var screen: null
+    property var previousToplevel: null
+    property string previousAddress: ""
+
+    Timer {
+        id: refocusTimer
+        interval: 35
+        repeat: false
+        onTriggered: controller.doRefocus()
+    }
+
+    function doRefocus() {
+        if (controller.previousToplevel) {
+            try {
+                controller.previousToplevel.activate();
+            } catch(e) {}
+        }
+        controller.previousToplevel = null;
+        controller.previousAddress = "";
+    }
 
     function getScreen(scr) {
         if (scr === undefined || scr === null) return null;
@@ -30,6 +51,18 @@ Item {
     }
 
     function show(scr) {
+        controller.previousToplevel = (typeof ToplevelManager !== "undefined") ? ToplevelManager.activeToplevel : null;
+        let addr = "";
+        try {
+            if (typeof Hyprland !== "undefined" && Hyprland.activeToplevel) {
+                let ht = Hyprland.activeToplevel.HyprlandToplevel;
+                if (ht && ht.address) {
+                    addr = ht.address;
+                }
+            }
+        } catch(e) {}
+        controller.previousAddress = addr;
+
         let target = getScreen(scr);
         if (target !== null && target !== undefined) {
             controller.screen = target;
@@ -41,6 +74,7 @@ Item {
 
     function hide() {
         controller.isVisible = false;
+        refocusTimer.restart();
     }
 
     function toggle(scr) {

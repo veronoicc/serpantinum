@@ -529,6 +529,11 @@
     "recent": "Recientes",
     "pinned": "Fijados"
   },
+  "tts": {
+    "title": "Texto a voz",
+    "placeholder": "Escribe texto para hablar...",
+    "speak": "Hablar"
+  },
   "lock": {
     "status": {
       "locked": "Bloqueado",

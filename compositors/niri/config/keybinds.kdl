@@ -28,6 +28,7 @@ binds {
     Mod+R { spawn "serpantinum" "reload"; }
     Mod+C { spawn "serpantinum" "msg" "toggle" "clipboard"; }
     Mod+G { spawn "serpantinum" "msg" "toggle" "downloader"; }
+    Mod+X { spawn "serpantinum" "msg" "toggle" "tts"; }
     Mod+D { spawn "serpantinum" "msg" "toggle" "launcher"; }
     Mod+Q { spawn "serpantinum" "msg" "toggle" "music"; }
     Mod+B { spawn "serpantinum" "msg" "toggle" "system"; }

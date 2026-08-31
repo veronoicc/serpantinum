@@ -529,6 +529,11 @@
     "recent": "Zuletzt verwendet",
     "pinned": "Angeheftet"
   },
+  "tts": {
+    "title": "Text-to-Speech",
+    "placeholder": "Text zum Sprechen eingeben...",
+    "speak": "Sprechen"
+  },
   "lock": {
     "status": {
       "locked": "Gesperrt",

@@ -53,10 +53,12 @@ PanelWindow {
                 } else if (cmd === "open") {
                     ClipboardController.hide();
                     DownloaderController.hide();
+                    TtsController.hide();
                     LauncherController.show(masterWindow.screen);
                 } else {
                     ClipboardController.hide();
                     DownloaderController.hide();
+                    TtsController.hide();
                     LauncherController.toggle(masterWindow.screen);
                 }
                 return;
@@ -68,10 +70,12 @@ PanelWindow {
                 } else if (cmd === "open") {
                     LauncherController.hide();
                     DownloaderController.hide();
+                    TtsController.hide();
                     ClipboardController.show(masterWindow.screen);
                 } else {
                     LauncherController.hide();
                     DownloaderController.hide();
+                    TtsController.hide();
                     ClipboardController.toggle(masterWindow.screen);
                 }
                 return;
@@ -83,11 +87,30 @@ PanelWindow {
                 } else if (cmd === "open") {
                     LauncherController.hide();
                     ClipboardController.hide();
+                    TtsController.hide();
                     DownloaderController.show(masterWindow.screen);
                 } else {
                     LauncherController.hide();
                     ClipboardController.hide();
+                    TtsController.hide();
                     DownloaderController.toggle(masterWindow.screen);
+                }
+                return;
+            }
+
+            if (cmd === "tts" || targetWidget === "tts") {
+                if (cmd === "close") {
+                    TtsController.hide();
+                } else if (cmd === "open") {
+                    LauncherController.hide();
+                    ClipboardController.hide();
+                    DownloaderController.hide();
+                    TtsController.show(masterWindow.screen);
+                } else {
+                    LauncherController.hide();
+                    ClipboardController.hide();
+                    DownloaderController.hide();
+                    TtsController.toggle(masterWindow.screen);
                 }
                 return;
             }

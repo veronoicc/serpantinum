@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Io
 import "../"
 import "../reusables"
@@ -17,12 +18,18 @@ PanelWindow {
 
     WlrLayershell.namespace: "qs-applauncher"
     WlrLayershell.layer: WlrLayer.Overlay
-    focusable: launcherWindow.isVisible
+    WlrLayershell.keyboardFocus: launcherWindow.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
 
     mask: Region {
         item: (launcherWindow.isVisible || container.animProgress > 0.001) ? maskBoundary : null
+    }
+    HyprlandFocusGrab {
+        id: focusGrab
+        windows: [ launcherWindow ]
+        active: launcherWindow.isVisible
+        onCleared: LauncherController.hide()
     }
 
     anchors {

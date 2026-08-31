@@ -8,6 +8,7 @@ Main 1.0 Main.qml
 TrayBase 1.0 popouts/TrayBase.qml
 Osd 1.0 popouts/Osd.qml
 SideMusicPopout popouts/SideMusicPopout.qml
+TtsPopout 1.0 popouts/TtsPopout.qml
 
 singleton Audio 1.0 singletons/Audio.qml
 singleton Caching 1.0 singletons/Caching.qml
@@ -33,6 +34,7 @@ singleton OsdController 1.0 singletons/widgetcontrols/OsdController.qml
 singleton SideMusicController 1.0 singletons/widgetcontrols/SideMusicController.qml
 singleton ClipboardController 1.0 singletons/widgetcontrols/ClipboardController.qml
 singleton DownloaderController 1.0 singletons/widgetcontrols/DownloaderController.qml
+singleton TtsController 1.0 singletons/widgetcontrols/TtsController.qml
 
 PopoutManager 1.0 popouts/PopoutManager.qml
 

@@ -529,6 +529,11 @@
     "recent": "Recent",
     "pinned": "Pinned"
   },
+  "tts": {
+    "title": "Text to Speech",
+    "placeholder": "Type text to speak...",
+    "speak": "Speak"
+  },
   "lock": {
     "status": {
       "locked": "Locked",

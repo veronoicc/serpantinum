@@ -6,6 +6,7 @@ import QtQuick.Shapes
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Io
 import "../"
 import "../reusables"
@@ -17,12 +18,18 @@ PanelWindow {
 
     WlrLayershell.namespace: "qs-downloader"
     WlrLayershell.layer: WlrLayer.Overlay
-    focusable: downloaderWindow.isVisible
+    WlrLayershell.keyboardFocus: downloaderWindow.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
 
     Region { id: emptyRegion }
     mask: (downloaderWindow.isVisible || container.animProgress > 0.001) ? null : emptyRegion
+    HyprlandFocusGrab {
+        id: focusGrab
+        windows: [ downloaderWindow ]
+        active: downloaderWindow.isVisible
+        onCleared: DownloaderController.hide()
+    }
     anchors {
         top: true
         bottom: true
