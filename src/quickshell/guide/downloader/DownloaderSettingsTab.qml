@@ -555,14 +555,10 @@ Item {
                                          downloaderTabRoot.moveFormat(presetCard.index, 1);
                                      }
                                  }
-                                 IconButton {
-                                     implicitWidth: rootObj.s(32)
-                                     implicitHeight: rootObj.s(32)
+                                 DeleteButton {
+                                     size: rootObj.s(32)
                                      cornerRadius: ThemeBackend.borderRadius
-                                     buttonIcon: "󰅖"
                                      iconFontSize: rootObj.s(14)
-                                     accentColor: Qt.alpha(ThemeBackend.red, 0.15)
-                                     textColor: isHoveredOrHighlighted ? Qt.lighter(ThemeBackend.red, 1.2) : ThemeBackend.red
                                      enabled: formatsListModel.count > 1
                                      opacity: formatsListModel.count > 1 ? 1.0 : 0.4
                                      onClicked: {

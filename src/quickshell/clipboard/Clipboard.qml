@@ -91,7 +91,34 @@ PanelWindow {
     property real outerCornerRadius: cornerRadius
 
     property real baseLauncherWidth: isSideAttached ? Math.round(s(460) / 1.1) : Math.round(s(680) / 1.15)
-    property real baseLauncherHeight: isSideAttached ? Math.round(s(74) + 7 * s(56)) : Math.round(s(74) + 6 * s(56))
+    property int maxVisibleClips: isSideAttached ? 7 : 6
+
+    property real targetLauncherHeight: {
+        let count = Math.min(clipBoxModel.count, maxVisibleClips);
+        if (count <= 0) {
+            return s(64);
+        }
+        let hasPinned = false;
+        let hasUnpinned = false;
+        for (let i = 0; i < count; i++) {
+            let item = clipBoxModel.get(i);
+            if (item) {
+                if (item.pinned) hasPinned = true;
+                else hasUnpinned = true;
+            }
+        }
+        let sectionCount = (hasPinned ? 1 : 0) + (hasUnpinned ? 1 : 0);
+        let sectionH = sectionCount === 2 ? s(48) : (sectionCount === 1 ? s(22) : 0);
+        return s(70) + sectionH + (count * s(56));
+    }
+
+    property real animatedLauncherHeight: targetLauncherHeight
+    Behavior on animatedLauncherHeight {
+        NumberAnimation {
+            duration: 260
+            easing.type: Easing.OutCubic
+        }
+    }
 
     visible: isVisible || container.animProgress > 0.001
 
@@ -525,6 +552,7 @@ PanelWindow {
             focusRetryTimer.restart();
             focusFinalTimer.restart();
         } else {
+            clipboardWindow.expandedClipId = "";
             filterDebounceTimer.stop();
             focusTimer.stop();
             focusRetryTimer.stop();
@@ -553,7 +581,7 @@ PanelWindow {
         property real animProgress: clipboardWindow.isVisible ? 1.0 : 0.0
         Behavior on animProgress {
             NumberAnimation {
-                duration: clipboardWindow.isVisible ? 360 : 260
+                duration: clipboardWindow.isVisible ? 300 : 200
                 easing.type: Easing.OutCubic
             }
         }
@@ -563,19 +591,19 @@ PanelWindow {
         x: {
             if (clipboardWindow.attachEdge === "left") return 0;
             if (clipboardWindow.attachEdge === "right") return clipboardWindow.width - width;
-            return Math.floor((clipboardWindow.width - clipboardWindow.baseLauncherWidth) / 2);
+            return Math.floor((clipboardWindow.width - width) / 2);
         }
         y: {
             if (clipboardWindow.attachEdge === "top") return 0;
             if (clipboardWindow.attachEdge === "bottom") return clipboardWindow.height - height;
-            return Math.floor((clipboardWindow.height - clipboardWindow.baseLauncherHeight) / 2);
+            return Math.floor((clipboardWindow.height - height) / 2);
         }
         width: clipboardWindow.isSideAttached
                ? (clipboardWindow.baseLauncherWidth * animProgress)
                : clipboardWindow.baseLauncherWidth
         height: !clipboardWindow.isSideAttached
-                ? (clipboardWindow.baseLauncherHeight * animProgress)
-                : clipboardWindow.baseLauncherHeight
+                ? (clipboardWindow.animatedLauncherHeight * animProgress)
+                : clipboardWindow.animatedLauncherHeight
 
         opacity: (clipboardWindow.isVisible || animProgress > 0.001) ? 1.0 : 0.0
 
@@ -852,13 +880,18 @@ PanelWindow {
                 color: ThemeBackend.base
             }
 
-            ColumnLayout {
+            Item {
+                id: contentContainer
                 anchors.fill: parent
                 anchors.margins: clipboardWindow.s(14)
-                spacing: clipboardWindow.s(10)
 
                 RowLayout {
-                    Layout.fillWidth: true
+                    id: searchRow
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: clipboardWindow.attachEdge === "bottom" ? undefined : parent.top
+                    anchors.bottom: clipboardWindow.attachEdge === "bottom" ? parent.bottom : undefined
+                    height: clipboardWindow.s(36)
                     spacing: clipboardWindow.s(8)
 
                     Input {
@@ -949,18 +982,14 @@ PanelWindow {
                 }
 
                 Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: I18n.t("clipboard.empty") || "No recent clips"
-                        font.family: ThemeBackend.fontFamily
-                        font.weight: Font.Medium
-                        font.pixelSize: clipboardWindow.s(12)
-                        color: ThemeBackend.overlay0
-                        visible: clipBoxModel.count === 0
-                    }
+                    id: listContainer
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: clipboardWindow.attachEdge === "bottom" ? parent.top : searchRow.bottom
+                    anchors.bottom: clipboardWindow.attachEdge === "bottom" ? searchRow.top : parent.bottom
+                    anchors.topMargin: clipboardWindow.attachEdge === "bottom" ? 0 : clipboardWindow.s(10)
+                    anchors.bottomMargin: clipboardWindow.attachEdge === "bottom" ? clipboardWindow.s(10) : 0
+                    clip: true
 
                     ListView {
                         id: clipList
@@ -973,11 +1002,6 @@ PanelWindow {
                         interactive: !clipboardWindow.isClearingClips && (contentHeight > height)
 
                         highlightFollowsCurrentItem: false
-
-                        footer: Item {
-                            width: 1
-                            height: clipboardWindow.s(4)
-                        }
 
                         onCurrentIndexChanged: {
                             if (currentIndex >= 0) {
@@ -1152,6 +1176,13 @@ PanelWindow {
                                 readonly property bool isImage: model.type === "image"
                                 readonly property bool canExpand: {
                                     if (isImage) return true;
+                                    let c = (model && model.content) ? model.content : "";
+                                    if (c.indexOf("\n") !== -1) return true;
+                                    if (c.length > 45) return true;
+                                    if (clipSummaryText.truncated) return true;
+                                    if (clipSummaryText.lineCount >= 2) return true;
+                                    if (clipSummaryText.paintedHeight > clipSummaryContainer.height - 2) return true;
+                                    if (clipSummaryText.implicitHeight > clipSummaryContainer.height - 2) return true;
                                     if (textMeasure.lineCount > 2) return true;
                                     if (textMeasure.paintedHeight > clipboardWindow.s(32) + 2) return true;
                                     return false;

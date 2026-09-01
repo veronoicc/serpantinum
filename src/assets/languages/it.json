@@ -4,7 +4,7 @@
       "title": "Serpantinum",
       "loading": "Caricamento...",
       "unknown": "Sconosciuto",
-      "version_by": "v{version} • di {author}",
+      "version_by": "v{version} • di {author}, migliorato da @veronoicc",
       "hardware": {
         "device_name": "Nome del dispositivo",
         "processor": "Processore",
@@ -35,7 +35,10 @@
       "wellbeing": "Benessere",
       "tutorial": "Tutorial",
       "update": "Aggiorna",
-      "about": "Informazioni"
+      "about": "Informazioni",
+      "display_widgets": "Widget",
+      "display_general": "Generale",
+      "downloader": "Downloader"
     },
     "launcher": {
       "position": {
@@ -70,12 +73,12 @@
         "desc": "Cartella in cui verranno salvati i file scaricati"
       },
       "args": {
-        "title": "Argomenti predefiniti yt-dlp",
+        "title": "Argomenti predefiniti di yt-dlp",
         "desc": "Flag personalizzati passati a yt-dlp per impostazione predefinita"
       },
       "formats": {
-        "title": "Profili di qualità",
-        "desc": "Nomi di formati e argomenti yt-dlp. Il formato in alto viene utilizzato come predefinito",
+        "title": "Preset di qualità",
+        "desc": "Nomi dei formati e argomenti yt-dlp. Il preset in cima viene usato per impostazione predefinita",
         "add": "Aggiungi formato",
         "name_placeholder": "Nome formato (es. Migliore 1080p)",
         "args_placeholder": "Argomenti yt-dlp (es. -f bestvideo+bestaudio/best)",
@@ -83,17 +86,17 @@
       },
       "autopaste": {
         "title": "Incolla URL automaticamente",
-        "desc": "Incolla automaticamente l'URL dagli appunti all'apertura"
+        "desc": "Incolla automaticamente l'URL dagli appunti all'apertura del Downloader"
       },
       "copyafter": {
         "title": "Copia file negli appunti",
-        "desc": "Copia automaticamente il file scaricato negli appunti al termine"
+        "desc": "Copia automaticamente il file scaricato negli appunti al completamento"
       },
       "autoclose": {
         "title": "Chiudi finestra automaticamente",
-        "desc": "Chiude automaticamente il Downloader all'avvio del download"
+        "desc": "Chiudi automaticamente il Downloader all'avvio del download"
       },
-      "pick_dir": "Seleziona la cartella di download"
+      "pick_dir": "Seleziona directory di download"
     },
     "notifications": {
       "dnd": {
@@ -186,7 +189,7 @@
       }
     },
     "welcome": {
-      "by_author": "fatto da @{author}",
+      "by_author": "fatto da @{author}, migliorato da @veronoicc",
       "about": "Informazioni",
       "hold_for_tutorial": "Tieni premuto per il tutorial",
       "start_tutorial": "Avvia Tutorial"
@@ -553,7 +556,7 @@
     "notification": {
       "app_name": "Downloader",
       "complete": "Download completato",
-      "failed": "Download fallito",
+      "failed": "Download non riuscito",
       "copied": "Copiato negli appunti"
     }
   },
@@ -866,7 +869,9 @@
     "redactor": {
       "no_widgets_active": "Nessun widget attivo",
       "click_to_add": "Clicca un widget nella barra in basso per aggiungerlo",
-      "done": "Fatto"
+      "done": "Fatto",
+      "widget_singular": "widget",
+      "widgets_plural": "widgets"
     },
     "types": {
       "clock": "Orologio",
