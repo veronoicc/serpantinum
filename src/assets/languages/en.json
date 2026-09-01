@@ -74,6 +74,14 @@
         "title": "Default yt-dlp arguments",
         "desc": "Custom flags passed to yt-dlp by default"
       },
+      "formats": {
+        "title": "Quality Presets",
+        "desc": "Custom format names and yt-dlp arguments. Top preset is used by default",
+        "add": "Add Format",
+        "name_placeholder": "Format name (e.g. Best 1080p)",
+        "args_placeholder": "yt-dlp arguments (e.g. -f bestvideo+bestaudio/best)",
+        "default_badge": "Default"
+      },
       "autopaste": {
         "title": "Auto-paste URL",
         "desc": "Automatically paste clipboard URL when opening Downloader"
@@ -81,6 +89,10 @@
       "copyafter": {
         "title": "Copy file to clipboard",
         "desc": "Automatically copy downloaded file to clipboard upon completion"
+      },
+      "autoclose": {
+        "title": "Auto-close window",
+        "desc": "Automatically close Downloader when download begins"
       },
       "pick_dir": "Select download directory"
     },
@@ -533,6 +545,14 @@
     "title": "Text to Speech",
     "placeholder": "Type text to speak...",
     "speak": "Speak"
+  },
+  "downloader": {
+    "notification": {
+      "app_name": "Downloader",
+      "complete": "Download Complete",
+      "failed": "Download Failed",
+      "copied": "Copied to clipboard"
+    }
   },
   "lock": {
     "status": {

@@ -57,11 +57,23 @@ PanelWindow {
         }
     }
 
+    property var defaultFormats: [
+        { "name": "Best (Video+Audio)", "args": "-f bestvideo+bestaudio/best" },
+        { "name": "Audio Only (Best)", "args": "-f bestaudio/best -x" },
+        { "name": "Video Only (Best)", "args": "-f bestvideo/best" }
+    ]
+
     property var defaultDownloaderSettings: ({
         "downloadDir": (Quickshell.env("HOME") || "") + "/Downloads",
         "defaultArgs": "",
+        "formats": [
+            { "name": "Best (Video+Audio)", "args": "-f bestvideo+bestaudio/best" },
+            { "name": "Audio Only (Best)", "args": "-f bestaudio/best -x" },
+            { "name": "Video Only (Best)", "args": "-f bestvideo/best" }
+        ],
         "autoPaste": true,
-        "copyAfter": true
+        "copyAfter": true,
+        "autoClose": false
     })
 
     property var downloaderSettings: {
@@ -76,8 +88,45 @@ PanelWindow {
 
     property string currentDownloadDir: downloaderSettings && downloaderSettings.downloadDir !== undefined ? downloaderSettings.downloadDir : ((Quickshell.env("HOME") || "") + "/Downloads")
     property string currentDefaultArgs: downloaderSettings && downloaderSettings.defaultArgs !== undefined ? downloaderSettings.defaultArgs : ""
+    property var currentFormats: (downloaderSettings && Array.isArray(downloaderSettings.formats) && downloaderSettings.formats.length > 0)
+        ? downloaderSettings.formats
+        : defaultFormats
     property bool autoPasteActive: downloaderSettings && downloaderSettings.autoPaste !== undefined ? downloaderSettings.autoPaste : true
     property bool copyAfterActive: downloaderSettings && downloaderSettings.copyAfter !== undefined ? downloaderSettings.copyAfter : true
+    property bool autoCloseActive: downloaderSettings && downloaderSettings.autoClose !== undefined ? downloaderSettings.autoClose : false
+
+    function parseArgs(str) {
+        if (!str) return [];
+        let args = [];
+        let cur = "";
+        let inDouble = false;
+        let inSingle = false;
+        let escaped = false;
+        for (let i = 0; i < str.length; i++) {
+            let c = str[i];
+            if (escaped) {
+                cur += c;
+                escaped = false;
+            } else if (c === "\\") {
+                escaped = true;
+            } else if (c === '"' && !inSingle) {
+                inDouble = !inDouble;
+            } else if (c === "'" && !inDouble) {
+                inSingle = !inSingle;
+            } else if ((c === ' ' || c === '\t' || c === '\n') && !inDouble && !inSingle) {
+                if (cur.length > 0) {
+                    args.push(cur);
+                    cur = "";
+                }
+            } else {
+                cur += c;
+            }
+        }
+        if (cur.length > 0) {
+            args.push(cur);
+        }
+        return args;
+    }
 
     function syncSettings() {
         let s = (typeof Config !== "undefined" && typeof Config.getSetting === "function")
@@ -85,8 +134,17 @@ PanelWindow {
             : downloaderWindow.defaultDownloaderSettings;
         downloaderWindow.currentDownloadDir = s.downloadDir !== undefined ? s.downloadDir : ((Quickshell.env("HOME") || "") + "/Downloads");
         downloaderWindow.currentDefaultArgs = s.defaultArgs !== undefined ? s.defaultArgs : "";
+        downloaderWindow.currentFormats = (s.formats && Array.isArray(s.formats) && s.formats.length > 0) ? s.formats : downloaderWindow.defaultFormats;
         downloaderWindow.autoPasteActive = s.autoPaste !== undefined ? s.autoPaste : true;
         downloaderWindow.copyAfterActive = s.copyAfter !== undefined ? s.copyAfter : true;
+        downloaderWindow.autoCloseActive = s.autoClose !== undefined ? s.autoClose : false;
+    }
+    function updateSetting(key, val) {
+        let current = JSON.parse(JSON.stringify((typeof Config !== "undefined" && typeof Config.getSetting === "function") ? Config.getSetting("downloader", defaultDownloaderSettings) : defaultDownloaderSettings));
+        current[key] = val;
+        if (typeof Config !== "undefined" && typeof Config.setSetting === "function") {
+            Config.setSetting("downloader", current);
+        }
     }
 
     property var rawBarSettings: {
@@ -110,8 +168,8 @@ PanelWindow {
     property real cornerRadius: ThemeBackend.borderRadius <= 16 ? ThemeBackend.borderRadius * 2 : Math.min(32, 32 - 16 * Math.exp(-(ThemeBackend.borderRadius - 16) / 12))
     property real outerCornerRadius: cornerRadius
 
-    property real baseWindowWidth: isSideAttached ? Math.round(s(480) / 1.1) : Math.round(s(640) / 1.15)
-    property real baseWindowHeight: isSideAttached ? Math.round(s(220)) : Math.round(s(180))
+    property real baseWindowWidth: isSideAttached ? Math.round(s(620)) : Math.round(s(680))
+    property real baseWindowHeight: isSideAttached ? Math.round(s(230)) : Math.round(s(190))
 
     visible: isVisible || container.animProgress > 0.001
 
@@ -202,20 +260,56 @@ PanelWindow {
     }
 
     function handleProcessExited(exitCode) {
+        let appName = (typeof I18n !== "undefined" && typeof I18n.t === "function") ? I18n.t("downloader.notification.app_name", "Downloader") : "Downloader";
+
         if (exitCode === 0) {
             downloaderWindow.status = "finished";
             downloaderWindow.progressPercent = 100.0;
             downloaderWindow.statusMessage = "Download completed successfully!";
 
-            if (downloaderWindow.copyAfterActive && downloaderWindow.downloadedFilePath !== "") {
-                let fp = downloaderWindow.downloadedFilePath;
+            let fp = downloaderWindow.downloadedFilePath;
+            let fileName = fp ? fp.split("/").pop() : "";
+
+            if (downloaderWindow.copyAfterActive && fp !== "") {
                 Quickshell.execDetached(["bash", "-c", `wl-copy -t text/uri-list "file://$(realpath '${fp}')" 2>/dev/null || wl-copy < '${fp}' 2>/dev/null`]);
             }
             if (typeof Sounds !== "undefined") Sounds.playSfx("system/success.wav");
+
+            let notifTitle = (typeof I18n !== "undefined" && typeof I18n.t === "function") ? I18n.t("downloader.notification.complete", "Download Complete") : "Download Complete";
+            let notifBody = "";
+            let copiedText = (typeof I18n !== "undefined" && typeof I18n.t === "function") ? I18n.t("downloader.notification.copied", "Copied to clipboard") : "Copied to clipboard";
+
+            if (fileName !== "") {
+                if (downloaderWindow.copyAfterActive) {
+                    notifBody = fileName + "\n" + copiedText;
+                } else {
+                    notifBody = fileName;
+                }
+            } else if (downloaderWindow.copyAfterActive) {
+                notifBody = copiedText;
+            }
+
+            Quickshell.execDetached([
+                "notify-send",
+                "-a", appName,
+                "-i", "folder-download",
+                notifTitle,
+                notifBody
+            ]);
         } else {
             downloaderWindow.status = "error";
             downloaderWindow.statusMessage = "Download failed (Exit code " + exitCode + ")";
             if (typeof Sounds !== "undefined") Sounds.playSfx("reusables/inputfield/error.wav");
+
+            let errTitle = (typeof I18n !== "undefined" && typeof I18n.t === "function") ? I18n.t("downloader.notification.failed", "Download Failed") : "Download Failed";
+            Quickshell.execDetached([
+                "notify-send",
+                "-a", appName,
+                "-u", "critical",
+                "-i", "dialog-error",
+                errTitle,
+                downloaderWindow.statusMessage
+            ]);
         }
     }
 
@@ -239,16 +333,23 @@ PanelWindow {
         let dlDir = downloaderWindow.currentDownloadDir || (Quickshell.env("HOME") + "/Downloads");
 
         let fmtArgs = [];
-        if (formatDropdown.currentIndex === 0) {
-            fmtArgs = ["-f", "bestvideo+bestaudio/best"];
-        } else if (formatDropdown.currentIndex === 1) {
-            fmtArgs = ["-f", "bestaudio/best", "-x"];
-        } else if (formatDropdown.currentIndex === 2) {
-            fmtArgs = ["-f", "bestvideo/best"];
-        } else if (formatDropdown.currentIndex === 3) {
+        let customIndex = formatDropdown.options.length - 1;
+        if (formatDropdown.currentIndex >= 0 && formatDropdown.currentIndex < downloaderWindow.currentFormats.length) {
+            let selectedPreset = downloaderWindow.currentFormats[formatDropdown.currentIndex];
+            let presetArgs = selectedPreset ? (selectedPreset.args || "") : "";
+            if (presetArgs.trim() !== "") {
+                let parsed = downloaderWindow.parseArgs(presetArgs);
+                for (let i = 0; i < parsed.length; i++) fmtArgs.push(parsed[i]);
+            }
+        } else if (formatDropdown.currentIndex === customIndex) {
             let customFmt = (customFormatInput.text || "").trim();
             if (customFmt !== "") {
-                fmtArgs = ["-f", customFmt];
+                if (customFmt.startsWith("-")) {
+                    let parsed = downloaderWindow.parseArgs(customFmt);
+                    for (let i = 0; i < parsed.length; i++) fmtArgs.push(parsed[i]);
+                } else {
+                    fmtArgs = ["-f", customFmt];
+                }
             }
         }
 
@@ -261,6 +362,11 @@ PanelWindow {
             "-o", "%(title)s.%(ext)s"
         ];
 
+        if (downloaderWindow.currentDefaultArgs && downloaderWindow.currentDefaultArgs.trim() !== "") {
+            let extra = downloaderWindow.parseArgs(downloaderWindow.currentDefaultArgs);
+            for (let i = 0; i < extra.length; i++) cmd.push(extra[i]);
+        }
+
         for (let i = 0; i < fmtArgs.length; i++) {
             cmd.push(fmtArgs[i]);
         }
@@ -269,6 +375,10 @@ PanelWindow {
         ytDlpProc.command = cmd;
         ytDlpProc.running = true;
         if (typeof Sounds !== "undefined") Sounds.playSfx("system/quick_click.wav");
+
+        if (downloaderWindow.autoCloseActive) {
+            downloaderWindow.closeDownloader();
+        }
     }
 
     Timer {
@@ -296,6 +406,7 @@ PanelWindow {
         if (isVisible) {
             urlInput.clear();
             syncSettings();
+            formatDropdown.currentIndex = 0;
             if (downloaderWindow.status !== "downloading") {
                 downloaderWindow.status = "idle";
                 downloaderWindow.progressPercent = 0.0;
@@ -318,7 +429,6 @@ PanelWindow {
             if (formatDropdown.isOpen) formatDropdown.closePopup();
         }
     }
-
     Component.onCompleted: {
         syncSettings();
     }
@@ -659,14 +769,17 @@ PanelWindow {
 
                     Dropdown {
                         id: formatDropdown
-                        Layout.preferredWidth: formatDropdown.currentIndex === 3 ? downloaderWindow.s(140) : downloaderWindow.s(180)
+                        Layout.preferredWidth: formatDropdown.currentIndex === (formatDropdown.options.length - 1) ? downloaderWindow.s(120) : downloaderWindow.s(155)
                         Layout.preferredHeight: downloaderWindow.s(32)
-                        options: [
-                            "Best (Video+Audio)",
-                            "Audio Only (Best)",
-                            "Video Only (Best)",
-                            "Custom Format"
-                        ]
+                        options: {
+                            let list = [];
+                            let fmts = downloaderWindow.currentFormats;
+                            for (let i = 0; i < fmts.length; i++) {
+                                list.push(fmts[i].name || ("Format " + (i + 1)));
+                            }
+                            list.push("Custom Format");
+                            return list;
+                        }
                         currentIndex: 0
                         baseColor: ThemeBackend.surface0
                         accentColor: ThemeBackend.mauve
@@ -678,7 +791,7 @@ PanelWindow {
 
                     Input {
                         id: customFormatInput
-                        visible: formatDropdown.currentIndex === 3
+                        visible: formatDropdown.currentIndex === (formatDropdown.options.length - 1)
                         Layout.preferredWidth: downloaderWindow.s(110)
                         Layout.preferredHeight: downloaderWindow.s(32)
                         placeholderText: "e.g. 137+140"
@@ -704,14 +817,16 @@ PanelWindow {
                         Layout.preferredWidth: implicitWidth
                         buttonIcon: "󰅌"
                         buttonText: "Auto-paste"
+                        horizontalPadding: downloaderWindow.s(6)
                         checked: downloaderWindow.autoPasteActive
                         onToggled: function(c) {
                             downloaderWindow.autoPasteActive = c;
+                            downloaderWindow.updateSetting("autoPaste", c);
                         }
                         accentColor: ThemeBackend.mauve
                         baseColor: ThemeBackend.surface1
-                        textFontSize: downloaderWindow.s(11)
-                        iconFontSize: downloaderWindow.s(13)
+                        textFontSize: downloaderWindow.s(10.5)
+                        iconFontSize: downloaderWindow.s(12)
                     }
 
                     Toggle {
@@ -719,17 +834,35 @@ PanelWindow {
                         Layout.preferredWidth: implicitWidth
                         buttonIcon: "󰆏"
                         buttonText: "Copy File"
+                        horizontalPadding: downloaderWindow.s(6)
                         checked: downloaderWindow.copyAfterActive
                         onToggled: function(c) {
                             downloaderWindow.copyAfterActive = c;
+                            downloaderWindow.updateSetting("copyAfter", c);
                         }
                         accentColor: ThemeBackend.mauve
                         baseColor: ThemeBackend.surface1
-                        textFontSize: downloaderWindow.s(11)
-                        iconFontSize: downloaderWindow.s(13)
+                        textFontSize: downloaderWindow.s(10.5)
+                        iconFontSize: downloaderWindow.s(12)
+                    }
+
+                    Toggle {
+                        id: autoCloseToggle
+                        Layout.preferredWidth: implicitWidth
+                        buttonIcon: "󰅖"
+                        buttonText: "Auto-close"
+                        horizontalPadding: downloaderWindow.s(6)
+                        checked: downloaderWindow.autoCloseActive
+                        onToggled: function(c) {
+                            downloaderWindow.autoCloseActive = c;
+                            downloaderWindow.updateSetting("autoClose", c);
+                        }
+                        accentColor: ThemeBackend.mauve
+                        baseColor: ThemeBackend.surface1
+                        textFontSize: downloaderWindow.s(10.5)
+                        iconFontSize: downloaderWindow.s(12)
                     }
                 }
-
                 // 4. Progress Bar row
                 RowLayout {
                     Layout.fillWidth: true

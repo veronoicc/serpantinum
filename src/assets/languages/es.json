@@ -74,6 +74,14 @@
         "title": "Argumentos por defecto de yt-dlp",
         "desc": "Parámetros personalizados pasados a yt-dlp por defecto"
       },
+      "formats": {
+        "title": "Ajustes de calidad",
+        "desc": "Nombres de formatos y argumentos de yt-dlp. El formato superior se usa por defecto",
+        "add": "Añadir formato",
+        "name_placeholder": "Nombre del formato (ej. Mejor 1080p)",
+        "args_placeholder": "Argumentos yt-dlp (ej. -f bestvideo+bestaudio/best)",
+        "default_badge": "Por defecto"
+      },
       "autopaste": {
         "title": "Pegar URL automáticamente",
         "desc": "Pegar automáticamente la URL del portapapeles al abrir el descargador"
@@ -81,6 +89,10 @@
       "copyafter": {
         "title": "Copiar archivo al portapapeles",
         "desc": "Copiar automáticamente el archivo descargado al portapapeles al finalizar"
+      },
+      "autoclose": {
+        "title": "Cerrar ventana automáticamente",
+        "desc": "Cierra automáticamente el Descargador cuando comienza la descarga"
       },
       "pick_dir": "Seleccionar carpeta de descargas"
     },
@@ -533,6 +545,14 @@
     "title": "Texto a voz",
     "placeholder": "Escribe texto para hablar...",
     "speak": "Hablar"
+  },
+  "downloader": {
+    "notification": {
+      "app_name": "Descargador",
+      "complete": "Descarga completada",
+      "failed": "Error en la descarga",
+      "copied": "Copiado al portapapeles"
+    }
   },
   "lock": {
     "status": {

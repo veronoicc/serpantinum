@@ -109,6 +109,37 @@
       },
       "test": "Apri il programma di avvio"
     },
+    "downloader": {
+      "dir": {
+        "title": "Directory di download",
+        "desc": "Cartella in cui verranno salvati i file scaricati"
+      },
+      "args": {
+        "title": "Argomenti predefiniti yt-dlp",
+        "desc": "Flag personalizzati passati a yt-dlp per impostazione predefinita"
+      },
+      "formats": {
+        "title": "Profili di qualità",
+        "desc": "Nomi di formati e argomenti yt-dlp. Il formato in alto viene utilizzato come predefinito",
+        "add": "Aggiungi formato",
+        "name_placeholder": "Nome formato (es. Migliore 1080p)",
+        "args_placeholder": "Argomenti yt-dlp (es. -f bestvideo+bestaudio/best)",
+        "default_badge": "Predefinito"
+      },
+      "autopaste": {
+        "title": "Incolla URL automaticamente",
+        "desc": "Incolla automaticamente l'URL dagli appunti all'apertura"
+      },
+      "copyafter": {
+        "title": "Copia file negli appunti",
+        "desc": "Copia automaticamente il file scaricato negli appunti al termine"
+      },
+      "autoclose": {
+        "title": "Chiudi finestra automaticamente",
+        "desc": "Chiude automaticamente il Downloader all'avvio del download"
+      },
+      "pick_dir": "Seleziona la cartella di download"
+    },
     "notifications": {
       "dnd": {
         "title": "Non disturbare",
@@ -557,6 +588,19 @@
     "empty": "Niente trovato",
     "recent": "Recente",
     "pinned": "Appuntato"
+  },
+  "tts": {
+    "title": "Sintesi vocale",
+    "placeholder": "Digita il testo da pronunciare...",
+    "speak": "Parla"
+  },
+  "downloader": {
+    "notification": {
+      "app_name": "Downloader",
+      "complete": "Download completato",
+      "failed": "Download fallito",
+      "copied": "Copiato negli appunti"
+    }
   },
   "lock": {
     "status": {

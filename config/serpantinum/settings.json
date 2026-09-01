@@ -110,5 +110,26 @@
         "scale": 1
       }
     }
+  },
+  "downloader": {
+    "downloadDir": "~/Downloads",
+    "defaultArgs": "",
+    "formats": [
+      {
+        "name": "Best (Video+Audio)",
+        "args": "-f bestvideo+bestaudio/best"
+      },
+      {
+        "name": "Audio Only (Best)",
+        "args": "-f bestaudio/best -x"
+      },
+      {
+        "name": "Video Only (Best)",
+        "args": "-f bestvideo/best"
+      }
+    ],
+    "autoPaste": true,
+    "copyAfter": true,
+    "autoClose": false
   }
 }

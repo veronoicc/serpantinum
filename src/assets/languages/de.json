@@ -74,6 +74,14 @@
         "title": "Standard-Argumente für yt-dlp",
         "desc": "Standardmäßig an yt-dlp übergebene Flags"
       },
+      "formats": {
+        "title": "Qualitäts-Voreinstellungen",
+        "desc": "Formatnamen und yt-dlp-Argumente. Das oberste Format wird standardmäßig verwendet",
+        "add": "Format hinzufügen",
+        "name_placeholder": "Formatname (z. B. Bestes 1080p)",
+        "args_placeholder": "yt-dlp-Argumente (z. B. -f bestvideo+bestaudio/best)",
+        "default_badge": "Standard"
+      },
       "autopaste": {
         "title": "URL automatisch einfügen",
         "desc": "URL aus der Zwischenablage beim Öffnen automatisch einfügen"
@@ -81,6 +89,10 @@
       "copyafter": {
         "title": "Datei in Zwischenablage kopieren",
         "desc": "Heruntergeladene Datei nach Fertigstellung automatisch kopieren"
+      },
+      "autoclose": {
+        "title": "Fenster automatisch schließen",
+        "desc": "Downloader automatisch schließen, wenn der Download beginnt"
       },
       "pick_dir": "Download-Ordner auswählen"
     },
@@ -533,6 +545,14 @@
     "title": "Text-to-Speech",
     "placeholder": "Text zum Sprechen eingeben...",
     "speak": "Sprechen"
+  },
+  "downloader": {
+    "notification": {
+      "app_name": "Downloader",
+      "complete": "Download abgeschlossen",
+      "failed": "Download fehlgeschlagen",
+      "copied": "In die Zwischenablage kopiert"
+    }
   },
   "lock": {
     "status": {
