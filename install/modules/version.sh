@@ -64,7 +64,7 @@ get_installed_commit() {
 
 get_target_version() {
     local repo_root="$1"
-    local repo_slug="${2:-"${REPO_SLUG:-"ilyamiro/serpantinum"}"}"
+    local repo_slug="${2:-"${REPO_SLUG:-"veronoicc/serpantinum"}"}"
     local target_ver=""
 
     if [ -f "$repo_root/version.txt" ]; then
@@ -86,7 +86,7 @@ get_target_version() {
 
 get_target_commit() {
     local repo_root="$1"
-    local repo_slug="${2:-"${REPO_SLUG:-"ilyamiro/serpantinum"}"}"
+    local repo_slug="${2:-"${REPO_SLUG:-"veronoicc/serpantinum"}"}"
     local target_commit=""
 
     if [ -d "$repo_root/.git" ] && command -v git &>/dev/null; then
