@@ -476,6 +476,9 @@ Item {
                         handleOffColor: ThemeBackend.text
                         onToggled: function(c) {
                             generalTabRoot.muteSfx = c;
+                            if (typeof Sounds !== "undefined") {
+                                Sounds.generalSettings = Object.assign({}, Sounds.generalSettings || {}, { "muteSfx": c });
+                            }
                             generalTabRoot.updateGeneralSettings();
                         }
                     }
@@ -540,6 +543,9 @@ Item {
                             let rounded = Math.round(val);
                             if (generalTabRoot.sfxVolume !== rounded) {
                                 generalTabRoot.sfxVolume = rounded;
+                                if (typeof Sounds !== "undefined") {
+                                    Sounds.generalSettings = Object.assign({}, Sounds.generalSettings || {}, { "sfxVolume": rounded });
+                                }
                                 sfxVolumeDebounceTimer.restart();
                             }
                         }
