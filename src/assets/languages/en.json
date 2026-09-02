@@ -72,6 +72,21 @@
         "title": "Download directory",
         "desc": "Folder where downloaded files will be stored"
       },
+      "dirs": {
+        "title": "Download Directories",
+        "desc": "Custom folder names and paths. Top directory is used by default",
+        "add": "Add Directory",
+        "name_placeholder": "Folder name (e.g. Downloads)",
+        "path_placeholder": "Path (e.g. ~/Downloads)",
+        "default_badge": "Default"
+      },
+      "logs": {
+        "title": "Latest Download Log",
+        "desc": "Console output and status of the most recent download",
+        "copy": "Copy Log",
+        "clear": "Clear",
+        "empty": "No download logs yet"
+      },
       "args": {
         "title": "Default yt-dlp arguments",
         "desc": "Custom flags passed to yt-dlp by default"

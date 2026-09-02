@@ -13,6 +13,23 @@ Item {
     property var previousToplevel: null
     property string previousAddress: ""
 
+
+    // In-memory download state and logs
+    property string status: "idle" // "idle" | "downloading" | "finished" | "error"
+    property real progressPercent: 0.0
+    property string statusMessage: ""
+    property var logLines: []
+    property string downloadedFilePath: ""
+    property string lastUrl: ""
+
+    function clearLogs() {
+        logLines = [];
+        status = "idle";
+        statusMessage = "";
+        progressPercent = 0.0;
+        downloadedFilePath = "";
+        lastUrl = "";
+    }
     Timer {
         id: refocusTimer
         interval: 35

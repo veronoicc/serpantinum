@@ -15,11 +15,15 @@ TARGET="$2"
 SUBTARGET="$3"
 
 send_qs_ipc() {
-    if [[ -n "$MAIN_QML" ]]; then
-        quickshell -p "$MAIN_QML" ipc call main handleCommand "$@" >/dev/null 2>&1
-    else
-        quickshell ipc call main handleCommand "$@" >/dev/null 2>&1
+    local primary="$MAIN_QML"
+    local alt="$HOME/.local/share/serpantinum/src/quickshell/Shell.qml"
+    if [[ -n "$primary" ]]; then
+        quickshell -p "$primary" ipc call main handleCommand "$@" >/dev/null 2>&1 && return 0
     fi
+    if [[ -f "$alt" && "$primary" != "$alt" ]]; then
+        quickshell -p "$alt" ipc call main handleCommand "$@" >/dev/null 2>&1 && return 0
+    fi
+    quickshell ipc call main handleCommand "$@" >/dev/null 2>&1
 }
 
 log_widget_launch() {

@@ -248,7 +248,14 @@ if [[ "$1" == "ipc" ]]; then
     fi
 
     shift
-    exec quickshell -p "$SHELL_QML" ipc "$@"
+    alt="$HOME/.local/share/serpantinum/src/quickshell/Shell.qml"
+    if [ "$SHELL_QML" != "$alt" ] && [ -f "$alt" ]; then
+        if ! quickshell -p "$SHELL_QML" ipc "$@" 2>/dev/null; then
+            exec quickshell -p "$alt" ipc "$@"
+        fi
+    else
+        exec quickshell -p "$SHELL_QML" ipc "$@"
+    fi
 fi
 
 ALLOWED_SCRIPTS=(

@@ -113,6 +113,20 @@
   },
   "downloader": {
     "downloadDir": "~/Downloads",
+    "directories": [
+      {
+        "name": "Downloads",
+        "path": "~/Downloads"
+      },
+      {
+        "name": "Videos",
+        "path": "~/Videos"
+      },
+      {
+        "name": "Music",
+        "path": "~/Music"
+      }
+    ],
     "defaultArgs": "",
     "formats": [
       {
