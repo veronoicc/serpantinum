@@ -280,7 +280,8 @@
       },
       "workspaces": {
         "title": "Chọn số lượng không gian làm việc để hiển thị",
-        "disc": "Lưu ý: điều này không ảnh hưởng đến số lượng không gian làm việc thực tế trong compositor"
+        "disc": "Lưu ý: điều này không ảnh hưởng đến số lượng không gian làm việc thực tế trong compositor",
+        "desc": "Lưu ý: điều này không ảnh hưởng đến số lượng không gian làm việc thực tế trong compositor"
       },
       "opacity": {
         "title": "Độ mờ thanh tác vụ",
@@ -461,6 +462,14 @@
         "title": "Thư mục tải xuống",
         "desc": "Thư mục lưu trữ các tệp đã tải xuống"
       },
+      "dirs": {
+        "title": "Thư mục tải xuống",
+        "desc": "Tên thư mục và đường dẫn tùy chỉnh. Thư mục trên cùng được dùng làm mặc định",
+        "add": "Thêm thư mục",
+        "name_placeholder": "Tên thư mục (ví dụ: Downloads)",
+        "path_placeholder": "Đường dẫn (ví dụ: ~/Downloads)",
+        "default_badge": "Mặc định"
+      },
       "args": {
         "title": "Đối số yt-dlp mặc định",
         "desc": "Các cờ tùy chỉnh được truyền cho yt-dlp theo mặc định"
@@ -472,6 +481,13 @@
         "name_placeholder": "Tên định dạng (ví dụ: Tốt nhất 1080p)",
         "args_placeholder": "Đối số yt-dlp (ví dụ: -f bestvideo+bestaudio/best)",
         "default_badge": "Mặc định"
+      },
+      "logs": {
+        "title": "Nhật ký tải xuống mới nhất",
+        "desc": "Đầu ra bảng điều khiển và trạng thái của lần tải xuống gần nhất",
+        "copy": "Sao chép nhật ký",
+        "clear": "Xóa",
+        "empty": "Chưa có nhật ký tải xuống"
       },
       "autopaste": {
         "title": "Tự động dán URL",

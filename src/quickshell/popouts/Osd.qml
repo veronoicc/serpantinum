@@ -5,6 +5,8 @@ import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
+import Quickshell.Bluetooth
+import Quickshell.Networking
 import Quickshell.Services.Pipewire
 import "../reusables"
 import "../"
@@ -35,14 +37,54 @@ PanelWindow {
 
     readonly property color briColor: Qt.lighter(ThemeBackend.mauve, 1.1)
     readonly property color volColor: Qt.lighter(ThemeBackend.sapphire, 1.5)
+    readonly property color micColor: Qt.lighter(ThemeBackend.mauve, 1.3)
+    readonly property color capsColor: Qt.lighter(ThemeBackend.peach, 1.2)
+    readonly property color numColor: Qt.lighter(ThemeBackend.sapphire, 1.4)
+    readonly property color airColor: Qt.lighter(ThemeBackend.red, 1.2)
 
     property bool isVisible: OsdController.isVisible
     property string kind: OsdController.kind
     property int briVal: OsdController.briVal
+    property string stateVal: OsdController.stateVal
 
-    readonly property int volVal: Audio.defaultSink && Audio.defaultSink.audio ? Math.round(Audio.defaultSink.audio.volume * 100) : 0
-    readonly property bool isMuted: Audio.defaultSink && Audio.defaultSink.audio ? Audio.defaultSink.audio.muted : false
-    readonly property int currentVal: kind === "volume" ? volVal : briVal
+    readonly property bool isToggleKind: kind === "capslock" || kind === "numlock" || kind === "airplane"
+    readonly property bool isToggleActive: stateVal === "on" || stateVal === "true" || stateVal === "1"
+
+    readonly property color toggleActiveColor: {
+        if (kind === "capslock") return capsColor;
+        if (kind === "numlock") return numColor;
+        if (kind === "airplane") return airColor;
+        return ThemeBackend.mauve;
+    }
+
+    readonly property string toggleTitle: {
+        if (kind === "capslock") return "Caps Lock";
+        if (kind === "numlock") return "Num Lock";
+        if (kind === "airplane") return "Airplane Mode";
+        return "";
+    }
+
+    readonly property string toggleStatus: isToggleActive ? "ON" : "OFF"
+
+    readonly property PwNode activeSink: Audio.defaultSink || (Audio.outputs && Audio.outputs.length > 0 ? Audio.outputs[0] : null)
+    readonly property int volVal: activeSink && activeSink.audio ? Math.round(activeSink.audio.volume * 100) : 0
+    readonly property bool isMuted: activeSink && activeSink.audio ? activeSink.audio.muted : false
+
+    readonly property PwNode activeSource: Audio.defaultSource || (Audio.inputs && Audio.inputs.length > 0 ? Audio.inputs[0] : null)
+    readonly property int micVal: activeSource && activeSource.audio ? Math.round(activeSource.audio.volume * 100) : 0
+    readonly property bool isMicMuted: activeSource && activeSource.audio ? activeSource.audio.muted : false
+
+    readonly property bool isMutedState: {
+        if (kind === "volume") return isMuted;
+        if (kind === "mic") return isMicMuted;
+        return false;
+    }
+
+    readonly property int currentVal: {
+        if (kind === "volume") return volVal;
+        if (kind === "mic") return micVal;
+        return briVal;
+    }
 
     property int configRevision: 0
 
@@ -141,12 +183,31 @@ PanelWindow {
         onTriggered: {
             if (targetPct >= 0) {
                 if (targetPct > 0 && osdWindow.isMuted) {
-                    if (Audio.defaultSink && Audio.defaultSink.audio && Audio.defaultSink.audio.muted) {
-                        Audio.toggleMute(Audio.defaultSink);
+                    if (osdWindow.activeSink && osdWindow.activeSink.audio && osdWindow.activeSink.audio.muted) {
+                        Audio.toggleMute(osdWindow.activeSink);
                     }
                 }
-                if (Audio.defaultSink) {
-                    Audio.setVolume(Audio.defaultSink, targetPct);
+                if (osdWindow.activeSink) {
+                    Audio.setVolume(osdWindow.activeSink, targetPct);
+                }
+                targetPct = -1;
+            }
+        }
+    }
+
+    Timer {
+        id: micThrottle
+        interval: 50
+        property int targetPct: -1
+        onTriggered: {
+            if (targetPct >= 0) {
+                if (targetPct > 0 && osdWindow.isMicMuted) {
+                    if (osdWindow.activeSource && osdWindow.activeSource.audio && osdWindow.activeSource.audio.muted) {
+                        Audio.toggleMute(osdWindow.activeSource);
+                    }
+                }
+                if (osdWindow.activeSource) {
+                    Audio.setVolume(osdWindow.activeSource, targetPct);
                 }
                 targetPct = -1;
             }
@@ -449,7 +510,7 @@ PanelWindow {
             }
 
             Rectangle {
-                visible: osdWindow.isSolid && !osdWindow.isSideBar && osdWindow.isBottomBar && osdContainer.dynamicCornerRadius > 0.5
+                visible: osdWindow.isSolid && !osdWindow.isSideBar && !osdWindow.isBottomBar && osdContainer.dynamicCornerRadius > 0.5
                 x: parent.width - osdContainer.dynamicCornerRadius
                 y: parent.height - osdContainer.dynamicCornerRadius
                 width: osdContainer.dynamicCornerRadius
@@ -517,11 +578,24 @@ PanelWindow {
                 IconButton {
                     Layout.alignment: Qt.AlignHCenter
                     size: osdWindow.s(26)
-                    iconOffsetX: osdWindow.kind === "volume" ? -1 : -3
+                    iconOffsetX: {
+		        if (osdWindow.kind === "airplane" || osdWindow.kind === "capslock") return -1;
+		        if (osdWindow.kind === "volume") return -1;
+		        if (osdWindow.kind === "mic") return 0;
+		        return -3;
+		    }
                     cornerRadius: osdWindow.s(8)
                     buttonIcon: {
                         if (osdWindow.kind === "volume") {
                             return osdWindow.isMuted || osdWindow.volVal === 0 ? "󰖁" : (osdWindow.volVal > 50 ? "󰕾" : "󰖀");
+                        } else if (osdWindow.kind === "mic") {
+                            return osdWindow.isMicMuted || osdWindow.micVal === 0 ? "󰍭" : "󰍬";
+                        } else if (osdWindow.kind === "capslock") {
+                            return "󰬈";
+                        } else if (osdWindow.kind === "numlock") {
+                            return "󰎠";
+                        } else if (osdWindow.kind === "airplane") {
+                            return "󰀝";
                         } else {
                             return osdWindow.briVal > 66 ? "󰃠" : (osdWindow.briVal > 33 ? "󰃟" : "󰃞");
                         }
@@ -532,6 +606,10 @@ PanelWindow {
                         if (isHoveredOrHighlighted) return ThemeBackend.text;
                         if (osdWindow.kind === "volume") {
                             return osdWindow.isMuted ? ThemeBackend.overlay0 : osdWindow.volColor;
+                        } else if (osdWindow.kind === "mic") {
+                            return osdWindow.isMicMuted ? ThemeBackend.overlay0 : osdWindow.micColor;
+                        } else if (osdWindow.isToggleKind) {
+                            return osdWindow.isToggleActive ? osdWindow.toggleActiveColor : ThemeBackend.overlay0;
                         } else {
                             return osdWindow.briColor;
                         }
@@ -539,10 +617,22 @@ PanelWindow {
                     onClicked: {
                         OsdController.restartTimer();
                         if (osdWindow.kind === "volume") {
-                            if (Audio.defaultSink) {
-                                Audio.toggleMute(Audio.defaultSink);
+                            if (osdWindow.activeSink) {
+                                Audio.toggleMute(osdWindow.activeSink);
                             }
-                        } else {
+                        } else if (osdWindow.kind === "mic") {
+                            if (osdWindow.activeSource) {
+                                Audio.toggleMute(osdWindow.activeSource);
+                            }
+                        } else if (osdWindow.kind === "airplane") {
+                            if (osdWindow.isToggleActive) {
+                                Networking.wifiEnabled = true;
+                                if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = true;
+                            } else {
+                                Networking.wifiEnabled = false;
+                                if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = false;
+                            }
+                        } else if (osdWindow.kind === "brightness") {
                             briCmdThrottle.stop();
                             briCmdThrottle.targetPct = -1;
                             let target = osdWindow.briVal > 0 ? 0 : 100;
@@ -552,8 +642,29 @@ PanelWindow {
                     }
                 }
 
+                Rectangle {
+                    visible: osdWindow.isToggleKind
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: osdWindow.s(28)
+                    Layout.preferredHeight: osdWindow.s(22)
+                    radius: osdWindow.s(6)
+                    color: osdWindow.isToggleActive ? Qt.rgba(osdWindow.toggleActiveColor.r, osdWindow.toggleActiveColor.g, osdWindow.toggleActiveColor.b, 0.2) : ThemeBackend.surface1
+                    border.width: 1
+                    border.color: osdWindow.isToggleActive ? osdWindow.toggleActiveColor : "transparent"
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: osdWindow.toggleStatus
+                        font.family: ThemeBackend.fontFamily
+                        font.pixelSize: osdWindow.s(10)
+                        font.bold: true
+                        color: osdWindow.isToggleActive ? osdWindow.toggleActiveColor : ThemeBackend.overlay0
+                    }
+                }
+
                 Draggable {
                     id: verticalSlider
+                    visible: !osdWindow.isToggleKind
                     vertical: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: osdWindow.s(16)
@@ -563,7 +674,15 @@ PanelWindow {
                     value: osdWindow.currentVal
                     backgroundColor: ThemeBackend.surface1
 
-                    readonly property color activeColor: osdWindow.kind === "volume" ? (osdWindow.isMuted ? ThemeBackend.surface2 : osdWindow.volColor) : osdWindow.briColor
+                    readonly property color activeColor: {
+                        if (osdWindow.kind === "volume") {
+                            return osdWindow.isMuted ? ThemeBackend.surface2 : osdWindow.volColor;
+                        } else if (osdWindow.kind === "mic") {
+                            return osdWindow.isMicMuted ? ThemeBackend.surface2 : osdWindow.micColor;
+                        } else {
+                            return osdWindow.briColor;
+                        }
+                    }
 
                     accentColor: activeColor
                     gradColor1: activeColor
@@ -572,15 +691,15 @@ PanelWindow {
                     cornerRadius: osdWindow.s(5)
                     handleSize: osdWindow.s(16)
 
-                    handleColor: (osdWindow.kind === "volume" && osdWindow.isMuted) ? ThemeBackend.overlay0 : Qt.lighter(activeColor, 1.15)
-                    handleHoverColor: (osdWindow.kind === "volume" && osdWindow.isMuted) ? ThemeBackend.subtext0 : Qt.lighter(activeColor, 1.5)
-                    handleDragColor: (osdWindow.kind === "volume" && osdWindow.isMuted) ? ThemeBackend.text : Qt.lighter(activeColor, 1.45)
+                    handleColor: (osdWindow.isMutedState) ? ThemeBackend.overlay0 : Qt.lighter(activeColor, 1.15)
+                    handleHoverColor: (osdWindow.isMutedState) ? ThemeBackend.subtext0 : Qt.lighter(activeColor, 1.5)
+                    handleDragColor: (osdWindow.isMutedState) ? ThemeBackend.text : Qt.lighter(activeColor, 1.45)
                     handleBorderColor: Qt.rgba(0, 0, 0, 0.2)
 
                     onDragStarted: OsdController.cancelHide()
                     onDragFinished: {
                         OsdController.restartTimer();
-                        if (osdWindow.kind !== "volume" && briCmdThrottle.targetPct >= 0) {
+                        if (osdWindow.kind === "brightness" && briCmdThrottle.targetPct >= 0) {
                             briCmdThrottle.stop();
                             Quickshell.execDetached(["bash", Caching.qsDir + "/../scripts/brightness.sh", "set", briCmdThrottle.targetPct.toString()]);
                             briCmdThrottle.targetPct = -1;
@@ -589,15 +708,16 @@ PanelWindow {
                     onMoved: val => {
                         OsdController.restartTimer();
                         let pct = Math.max(0, Math.min(100, Math.round(val)));
-                        if (osdWindow.kind !== "volume") {
+                        if (osdWindow.kind === "brightness") {
                             OsdController.briVal = pct;
-                        }
-                        if (osdWindow.kind === "volume") {
-                            cmdThrottle.targetPct = pct;
-                            if (!cmdThrottle.running) cmdThrottle.start();
-                        } else {
                             briCmdThrottle.targetPct = pct;
                             if (!verticalSlider.isDragging) briCmdThrottle.restart();
+                        } else if (osdWindow.kind === "volume") {
+                            cmdThrottle.targetPct = pct;
+                            if (!cmdThrottle.running) cmdThrottle.start();
+                        } else if (osdWindow.kind === "mic") {
+                            micThrottle.targetPct = pct;
+                            if (!micThrottle.running) micThrottle.start();
                         }
                     }
                 }
@@ -617,10 +737,23 @@ PanelWindow {
                         anchors.centerIn: parent
                         size: osdWindow.s(30)
                         cornerRadius: osdWindow.s(8)
-                        iconOffsetX: osdWindow.kind === "volume" ? -1 : -3
+                        iconOffsetX: {
+			    if (osdWindow.kind === "airplane" || osdWindow.kind === "capslock") return -1;
+			    if (osdWindow.kind === "volume") return -1;
+			    if (osdWindow.kind === "mic") return 0;
+			    return -3;
+			}
                         buttonIcon: {
                             if (osdWindow.kind === "volume") {
                                 return osdWindow.isMuted || osdWindow.volVal === 0 ? "󰖁" : (osdWindow.volVal > 50 ? "󰕾" : "󰖀");
+                            } else if (osdWindow.kind === "mic") {
+                                return osdWindow.isMicMuted || osdWindow.micVal === 0 ? "󰍭" : "󰍬";
+                            } else if (osdWindow.kind === "capslock") {
+                                return "󰬈";
+                            } else if (osdWindow.kind === "numlock") {
+                                return "󰎠";
+                            } else if (osdWindow.kind === "airplane") {
+                                return "󰀝";
                             } else {
                                 return osdWindow.briVal > 66 ? "󰃠" : (osdWindow.briVal > 33 ? "󰃟" : "󰃞");
                             }
@@ -631,6 +764,10 @@ PanelWindow {
                             if (isHoveredOrHighlighted) return ThemeBackend.text;
                             if (osdWindow.kind === "volume") {
                                 return osdWindow.isMuted ? ThemeBackend.overlay0 : osdWindow.volColor;
+                            } else if (osdWindow.kind === "mic") {
+                                return osdWindow.isMicMuted ? ThemeBackend.overlay0 : osdWindow.micColor;
+                            } else if (osdWindow.isToggleKind) {
+                                return osdWindow.isToggleActive ? osdWindow.toggleActiveColor : ThemeBackend.overlay0;
                             } else {
                                 return osdWindow.briColor;
                             }
@@ -638,15 +775,75 @@ PanelWindow {
                         onClicked: {
                             OsdController.restartTimer();
                             if (osdWindow.kind === "volume") {
-                                if (Audio.defaultSink) {
-                                    Audio.toggleMute(Audio.defaultSink);
+                                if (osdWindow.activeSink) {
+                                    Audio.toggleMute(osdWindow.activeSink);
                                 }
-                            } else {
+                            } else if (osdWindow.kind === "mic") {
+                                if (osdWindow.activeSource) {
+                                    Audio.toggleMute(osdWindow.activeSource);
+                                }
+                            } else if (osdWindow.kind === "airplane") {
+                                if (osdWindow.isToggleActive) {
+                                    Networking.wifiEnabled = true;
+                                    if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = true;
+                                } else {
+                                    Networking.wifiEnabled = false;
+                                    if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = false;
+                                }
+                            } else if (osdWindow.kind === "brightness") {
                                 briCmdThrottle.stop();
                                 briCmdThrottle.targetPct = -1;
                                 let target = osdWindow.briVal > 0 ? 0 : 100;
                                 OsdController.briVal = target;
                                 Quickshell.execDetached(["bash", Caching.qsDir + "/../scripts/brightness.sh", "set", target.toString()]);
+                            }
+                        }
+                    }
+                }
+
+                RowLayout {
+                    visible: osdWindow.isToggleKind
+                    anchors.left: parent.left
+                    anchors.leftMargin: osdWindow.s(58)
+                    anchors.right: parent.right
+                    anchors.rightMargin: osdWindow.s(16)
+                    anchors.verticalCenter: parent.verticalCenter
+                    opacity: Math.max(0.0, Math.min(1.0, (osdContainer.animProgress - 0.2) / 0.8))
+                    spacing: osdWindow.s(8)
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: osdWindow.toggleTitle
+                        font.family: ThemeBackend.fontFamily
+                        font.pixelSize: osdWindow.s(14)
+                        font.bold: true
+                        color: ThemeBackend.text
+                        elide: Text.ElideRight
+                    }
+
+                    ClickButton {
+                        id: toggleBtn
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.preferredHeight: osdWindow.s(24)
+                        Layout.preferredWidth: implicitWidth
+                        height: osdWindow.s(24)
+                        cornerRadius: osdWindow.s(6)
+                        horizontalPadding: osdWindow.s(10)
+                        buttonText: osdWindow.toggleStatus
+                        textFontSize: osdWindow.s(11)
+                        accentColor: osdWindow.isToggleActive ? osdWindow.toggleActiveColor : ThemeBackend.surface1
+                        textColor: osdWindow.isToggleActive ? ThemeBackend.base : ThemeBackend.subtext0
+
+                        onClicked: {
+                            OsdController.restartTimer();
+                            if (osdWindow.kind === "airplane") {
+                                if (osdWindow.isToggleActive) {
+                                    Networking.wifiEnabled = true;
+                                    if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = true;
+                                } else {
+                                    Networking.wifiEnabled = false;
+                                    if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = false;
+                                }
                             }
                         }
                     }
@@ -658,16 +855,26 @@ PanelWindow {
                     height: osdWindow.s(18)
                     anchors.left: parent.left
                     anchors.leftMargin: osdWindow.s(58)
+                    anchors.right: parent.right
+                    anchors.rightMargin: osdWindow.s(16)
                     anchors.verticalCenter: parent.verticalCenter
                     opacity: Math.max(0.0, Math.min(1.0, (osdContainer.animProgress - 0.2) / 0.8))
-                    visible: opacity > 0.01
+                    visible: !osdWindow.isToggleKind && opacity > 0.01
 
                     from: 0.0
                     to: 100.0
                     value: osdWindow.currentVal
                     backgroundColor: ThemeBackend.surface1
 
-                    readonly property color activeColor: osdWindow.kind === "volume" ? (osdWindow.isMuted ? ThemeBackend.surface2 : osdWindow.volColor) : osdWindow.briColor
+                    readonly property color activeColor: {
+                        if (osdWindow.kind === "volume") {
+                            return osdWindow.isMuted ? ThemeBackend.surface2 : osdWindow.volColor;
+                        } else if (osdWindow.kind === "mic") {
+                            return osdWindow.isMicMuted ? ThemeBackend.surface2 : osdWindow.micColor;
+                        } else {
+                            return osdWindow.briColor;
+                        }
+                    }
 
                     accentColor: activeColor
                     gradColor1: activeColor
@@ -676,15 +883,15 @@ PanelWindow {
                     cornerRadius: osdWindow.s(5)
                     handleSize: osdWindow.s(16)
 
-                    handleColor: (osdWindow.kind === "volume" && osdWindow.isMuted) ? ThemeBackend.overlay0 : Qt.lighter(activeColor, 1.15)
-                    handleHoverColor: (osdWindow.kind === "volume" && osdWindow.isMuted) ? ThemeBackend.subtext0 : Qt.lighter(activeColor, 1.5)
-                    handleDragColor: (osdWindow.kind === "volume" && osdWindow.isMuted) ? ThemeBackend.text : Qt.lighter(activeColor, 1.45)
+                    handleColor: (osdWindow.isMutedState) ? ThemeBackend.overlay0 : Qt.lighter(activeColor, 1.15)
+                    handleHoverColor: (osdWindow.isMutedState) ? ThemeBackend.subtext0 : Qt.lighter(activeColor, 1.5)
+                    handleDragColor: (osdWindow.isMutedState) ? ThemeBackend.text : Qt.lighter(activeColor, 1.45)
                     handleBorderColor: Qt.rgba(0, 0, 0, 0.2)
 
                     onDragStarted: OsdController.cancelHide()
                     onDragFinished: {
                         OsdController.restartTimer();
-                        if (osdWindow.kind !== "volume" && briCmdThrottle.targetPct >= 0) {
+                        if (osdWindow.kind === "brightness" && briCmdThrottle.targetPct >= 0) {
                             briCmdThrottle.stop();
                             Quickshell.execDetached(["bash", Caching.qsDir + "/../scripts/brightness.sh", "set", briCmdThrottle.targetPct.toString()]);
                             briCmdThrottle.targetPct = -1;
@@ -693,15 +900,16 @@ PanelWindow {
                     onMoved: val => {
                         OsdController.restartTimer();
                         let pct = Math.max(0, Math.min(100, Math.round(val)));
-                        if (osdWindow.kind !== "volume") {
+                        if (osdWindow.kind === "brightness") {
                             OsdController.briVal = pct;
-                        }
-                        if (osdWindow.kind === "volume") {
-                            cmdThrottle.targetPct = pct;
-                            if (!cmdThrottle.running) cmdThrottle.start();
-                        } else {
                             briCmdThrottle.targetPct = pct;
                             if (!horizontalSlider.isDragging) briCmdThrottle.restart();
+                        } else if (osdWindow.kind === "volume") {
+                            cmdThrottle.targetPct = pct;
+                            if (!cmdThrottle.running) cmdThrottle.start();
+                        } else if (osdWindow.kind === "mic") {
+                            micThrottle.targetPct = pct;
+                            if (!micThrottle.running) micThrottle.start();
                         }
                     }
                 }

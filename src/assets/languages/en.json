@@ -278,7 +278,7 @@
       },
       "schedule": {
         "title": "Automated schedule",
-        "desc": "Adjust color temperature automatically based on sunset and sunrise"
+        "desc": "Adjust color temperature automatically based on sunset and sunrise in"
       },
       "temperature": {
         "title": "Color temperature",
@@ -326,7 +326,8 @@
       },
       "workspaces": {
         "title": "Choose an amount of workspaces to display",
-        "disc": "Note: this doesn't affect the actual amount of workspaces in the compositor"
+        "disc": "Note: this doesn't affect the actual amount of workspaces in the compositor",
+        "desc": "Note: this doesn't affect the actual amount of workspaces in the compositor"
       },
       "opacity": {
         "title": "Bar opacity",

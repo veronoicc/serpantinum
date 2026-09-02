@@ -96,8 +96,9 @@ Rectangle {
                     id: infoLayout
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: barWindow ? barWindow.s(10) : 10
+                    transformOrigin: Item.Left
 
-                    scale: mediaInfoMouse.containsMouse ? 1.02 : 1.0
+                    scale: mediaInfoMouse.containsMouse ? 1.01 : 1.0
                     Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutExpo } }
 
                     Rectangle {
@@ -121,9 +122,9 @@ Rectangle {
 
                         Image {
                             anchors.fill: parent
-                            source: (isMediaActive && MprisController.artUrl) ? "file://" + MprisController.artUrl : ""
+                            source: (isMediaActive && MprisController.artUrl) ? (MprisController.artUrl.startsWith("file://") || MprisController.artUrl.startsWith("http") ? MprisController.artUrl : "file://" + MprisController.artUrl) : ""
                             fillMode: Image.PreserveAspectCrop
-                            visible: isMediaActive && MprisController.artUrl !== ""
+                            visible: isMediaActive && MprisController.artUrl !== "" && status === Image.Ready
                         }
 
                         Rectangle {

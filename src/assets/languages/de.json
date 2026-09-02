@@ -73,6 +73,14 @@
         "title": "Download-Verzeichnis",
         "desc": "Ordner, in dem heruntergeladene Dateien gespeichert werden"
       },
+      "dirs": {
+        "title": "Download-Verzeichnisse",
+        "desc": "Eigene Ordnernamen und Pfade. Das oberste Verzeichnis wird standardmäßig verwendet",
+        "add": "Verzeichnis hinzufügen",
+        "name_placeholder": "Ordnername (z. B. Downloads)",
+        "path_placeholder": "Pfad (z. B. ~/Downloads)",
+        "default_badge": "Standard"
+      },
       "args": {
         "title": "Standard-Argumente für yt-dlp",
         "desc": "Standardmäßig an yt-dlp übergebene Flags"
@@ -84,6 +92,13 @@
         "name_placeholder": "Formatname (z. B. Bestes 1080p)",
         "args_placeholder": "yt-dlp-Argumente (z. B. -f bestvideo+bestaudio/best)",
         "default_badge": "Standard"
+      },
+      "logs": {
+        "title": "Neuestes Download-Protokoll",
+        "desc": "Konsolenausgabe und Status des letzten Downloads",
+        "copy": "Protokoll kopieren",
+        "clear": "Löschen",
+        "empty": "Noch keine Download-Protokolle"
       },
       "autopaste": {
         "title": "URL automatisch einfügen",
@@ -312,7 +327,8 @@
       },
       "workspaces": {
         "title": "Anzahl anzuzeigender arbeitsflächen auswählen",
-        "disc": "Hinweis: Dies beeinflusst nicht die tatsächliche anzahl der arbeitsflächen im compositor"
+        "disc": "Hinweis: Dies beeinflusst nicht die tatsächliche anzahl der arbeitsflächen im compositor",
+        "desc": "Hinweis: Dies beeinflusst nicht die tatsächliche anzahl der arbeitsflächen im compositor"
       },
       "opacity": {
         "title": "Leistentransparenz",

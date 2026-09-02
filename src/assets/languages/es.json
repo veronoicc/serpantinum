@@ -73,6 +73,14 @@
         "title": "Directorio de descargas",
         "desc": "Carpeta donde se guardarán los archivos descargados"
       },
+      "dirs": {
+        "title": "Directorios de descarga",
+        "desc": "Nombres y rutas de carpetas personalizadas. La carpeta superior se usa por defecto",
+        "add": "Añadir directorio",
+        "name_placeholder": "Nombre de carpeta (ej. Descargas)",
+        "path_placeholder": "Ruta (ej. ~/Downloads)",
+        "default_badge": "Predeterminado"
+      },
       "args": {
         "title": "Argumentos por defecto de yt-dlp",
         "desc": "Parámetros personalizados pasados a yt-dlp por defecto"
@@ -84,6 +92,13 @@
         "name_placeholder": "Nombre del formato (ej. Mejor 1080p)",
         "args_placeholder": "Argumentos yt-dlp (ej. -f bestvideo+bestaudio/best)",
         "default_badge": "Por defecto"
+      },
+      "logs": {
+        "title": "Último registro de descarga",
+        "desc": "Salida de consola y estado de la descarga más reciente",
+        "copy": "Copiar registro",
+        "clear": "Limpiar",
+        "empty": "Aún no hay registros de descarga"
       },
       "autopaste": {
         "title": "Pegar URL automáticamente",
@@ -312,7 +327,8 @@
       },
       "workspaces": {
         "title": "Elegir cantidad de espacios de trabajo a mostrar",
-        "disc": "Nota: esto no afecta la cantidad real de espacios de trabajo en el compositor"
+        "disc": "Nota: esto no afecta la cantidad real de espacios de trabajo en el compositor",
+        "desc": "Nota: esto no afecta la cantidad real de espacios de trabajo en el compositor"
       },
       "opacity": {
         "title": "Opacidad de la barra",
